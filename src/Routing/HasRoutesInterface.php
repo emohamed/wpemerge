@@ -16,6 +16,14 @@ interface HasRoutesInterface {
 	public function getRoutes();
 
 	/**
+	 * Get a registered route by name
+	 *
+	 * @param  string         $name
+	 * @return RouteInterface
+	 */
+	public function getRoute( $name );
+
+	/**
 	 * Add a route
 	 *
 	 * @param RouteInterface  $route

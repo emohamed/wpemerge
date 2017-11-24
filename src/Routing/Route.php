@@ -38,6 +38,13 @@ class Route implements RouteInterface {
 	protected $handler = null;
 
 	/**
+	 * Route name
+	 *
+	 * @var string
+	 */
+	protected $name = '';
+
+	/**
 	 * Constructor
 	 *
 	 * @param string[]        $methods
@@ -79,6 +86,39 @@ class Route implements RouteInterface {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function setName( $name ) {
+		$this->name = $name;
+		return $this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function name( $name ) {
+		return $this->setName( $name );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getUrl( $parameters = [] ) {
+		if ( ! is_a( $this->target, UrlCondition::class ) ) {
+			throw new Exception( 'Only routes with Url conditions can be resolved to a url.' );
+		}
+
+		return $this->target->getUrlWithParameters( $parameters );
+	}
+
+	/**
 	 * Add a rewrite rule to WordPress for url-based routes
 	 *
 	 * @param  string $rewrite_to
@@ -89,7 +129,7 @@ class Route implements RouteInterface {
 			throw new Exception( 'Only routes with url targets can add rewrite rules.' );
 		}
 
-		$regex = $this->target->getValidationRegex( $this->target->getUrl(), false );
+		$regex = $this->target->getMatchingRegex( $this->target->getUrl(), false );
 		$regex = preg_replace( '~^\^/~', '^', $regex ); // rewrite rules require NO leading slash
 
 		add_filter( 'obsidian_routing_rewrite_rules', function( $rules ) use ( $regex, $rewrite_to ) {

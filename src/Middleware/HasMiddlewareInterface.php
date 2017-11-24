@@ -27,6 +27,7 @@ interface HasMiddlewareInterface {
 	/**
 	 * Alias for addMiddleware
 	 *
+	 * @see    Obsidian\Middleware\HasMiddlewareInterface::addMiddleware
 	 * @param  string|callable|\Obsidian\Middleware\middlewareInterface|array $middleware
 	 * @return object                                                         $this
 	 */

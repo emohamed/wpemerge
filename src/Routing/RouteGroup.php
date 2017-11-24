@@ -78,6 +78,34 @@ class RouteGroup implements RouteInterface {
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getName() {
+		return '';
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function setName( $name ) {
+		throw new Exception( 'Route groups cannot have names.' );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function name( $name ) {
+		return $this->setName( $name );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getUrl( $parameters = [] ) {
+		throw new Exception( 'Route groups do not have urls.' );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function route( $methods, $target, $handler ) {
 		if ( is_string( $target ) ) {
 			$target = new UrlCondition( $target );

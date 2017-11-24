@@ -26,6 +26,26 @@ trait HasRoutesTrait {
 	}
 
 	/**
+	 * Get a registered route by name
+	 *
+	 * @param  string         $name
+	 * @return RouteInterface
+	 */
+	public function getRoute( $name ) {
+		if ( $name === '' ) {
+			return null; // do not match unnamed routes
+		}
+
+		$routes = $this->getRoutes();
+		foreach ( $routes as $route ) {
+			if ( $route->getName() === $name ) {
+				return $route;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Add a route
 	 *
 	 * @param  RouteInterface $route

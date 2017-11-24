@@ -5,7 +5,7 @@ use Obsidian\Response;
 if ( ! function_exists( 'obs_response' ) ) {
 	/**
 	 * @codeCoverageIgnore
-	 * @see Response::response()
+	 * @see    \Obsidian\Response::response()
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	function obs_response() {
@@ -16,7 +16,7 @@ if ( ! function_exists( 'obs_response' ) ) {
 if ( ! function_exists( 'obs_output' ) ) {
 	/**
 	 * @codeCoverageIgnore
-	 * @see Response::output()
+	 * @see    \Obsidian\Response::output()
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	function obs_output( $output ) {
@@ -27,7 +27,7 @@ if ( ! function_exists( 'obs_output' ) ) {
 if ( ! function_exists( 'obs_template' ) ) {
 	/**
 	 * @codeCoverageIgnore
-	 * @see Response::template()
+	 * @see    \Obsidian\Response::template()
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	function obs_template( $templates, $context = array() ) {
@@ -38,7 +38,7 @@ if ( ! function_exists( 'obs_template' ) ) {
 if ( ! function_exists( 'obs_json' ) ) {
 	/**
 	 * @codeCoverageIgnore
-	 * @see Response::json()
+	 * @see    \Obsidian\Response::json()
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	function obs_json( $data ) {
@@ -49,7 +49,7 @@ if ( ! function_exists( 'obs_json' ) ) {
 if ( ! function_exists( 'obs_redirect' ) ) {
 	/**
 	 * @codeCoverageIgnore
-	 * @see Response::redirect()
+	 * @see    \Obsidian\Response::redirect()
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	function obs_redirect( $url, $status = 302 ) {
@@ -60,10 +60,23 @@ if ( ! function_exists( 'obs_redirect' ) ) {
 if ( ! function_exists( 'obs_error' ) ) {
 	/**
 	 * @codeCoverageIgnore
-	 * @see Response::error()
+	 * @see    \Obsidian\Response::error()
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	function obs_error( $code ) {
 		return Response::error( obs_response(), $code );
+	}
+}
+
+if ( ! function_exists( 'obs_route' ) ) {
+	/**
+	 * @codeCoverageIgnore
+	 * @see    \Obsidian\Router::getRouteUrl()
+	 * @param  string $name
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	function obs_route( $name, $parameters = [] ) {
+		return Router::getRouteUrl( $name, $parameters );
 	}
 }

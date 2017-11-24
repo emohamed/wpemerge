@@ -25,4 +25,36 @@ interface RouteInterface extends HasMiddlewareInterface {
 	 * @return \Psr\Http\Message\ResponseInterface
 	 */
 	public function handle( Request $request, $template );
+
+	/**
+	 * Get the route name
+	 *
+	 * @return string
+	 */
+	public function getName();
+
+	/**
+	 * Set the route name
+	 *
+	 * @param  string $name
+	 * @return self   $this
+	 */
+	public function setName( $name );
+
+	/**
+	 * Alias for setName
+	 *
+	 * @see    Obsidian\Routing\RouteInterface::setName
+	 * @param  string $name
+	 * @return self   $this
+	 */
+	public function name( $name );
+
+	/**
+	 * Get route url with parameter values
+	 *
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	public function getUrl( $parameters = [] );
 }

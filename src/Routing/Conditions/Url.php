@@ -2,6 +2,7 @@
 
 namespace Obsidian\Routing\Conditions;
 
+use Exception;
 use Obsidian\Url as UrlUtility;
 use Obsidian\Request;
 
@@ -30,7 +31,7 @@ class Url implements ConditionInterface {
 			(?P<optional>\?)?     # optionally allow the user to mark the parameter as option using literal ?
 			(?::(?P<regex>.*?))?  # optionally allow the user to supply a regex to match the argument against
 		(?:\})                    # require closing curly brace
-		(?=/)                     # lookahead for a slash
+		(?:/)                     # require trailing slash
 	~ix';
 
 	/**
@@ -57,23 +58,23 @@ class Url implements ConditionInterface {
 	 * {@inheritDoc}
 	 */
 	public function satisfied( Request $request ) {
-		if ( $this->url === static::WILDCARD ) {
+		if ( $this->getUrl() === static::WILDCARD ) {
 			return true;
 		}
 
-		$validation_regex = $this->getValidationRegex( $this->getUrl() );
+		$matching_regex = $this->getMatchingRegex( $this->getUrl() );
 		$url = UrlUtility::getCurrentPath( $request );
-		return (bool) preg_match( $validation_regex, $url );
+		return (bool) preg_match( $matching_regex, $url );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getArguments( Request $request ) {
-		$validation_regex = $this->getValidationRegex( $this->getUrl() );
+		$matching_regex = $this->getMatchingRegex( $this->getUrl() );
 		$url = UrlUtility::getCurrentPath( $request );
 		$matches = [];
-		$success = preg_match( $validation_regex, $url, $matches );
+		$success = preg_match( $matching_regex, $url, $matches );
 
 		if ( ! $success ) {
 			return []; // this should not normally happen
@@ -95,6 +96,30 @@ class Url implements ConditionInterface {
 	 */
 	public function getUrl() {
 		return $this->url;
+	}
+
+	/**
+	 * Return the url for this condition with parameter values
+	 *
+	 * @param  array  $parameters
+	 * @return string
+	 */
+	public function getUrlWithParameters( $parameters = [] ) {
+		$result = preg_replace_callback( $this->url_regex, function( $matches ) use ( $parameters ) {
+			$name = $matches['name'];
+			$optional = ! empty( $matches['optional'] );
+
+			if ( isset( $parameters[ $name ] ) ) {
+				return urlencode( $parameters[ $name ] ) . '/';
+			}
+
+			if ( ! $optional ) {
+				throw new Exception( 'No value supplied for the required parameter "' . $name . '"' );
+			}
+
+			return '';
+		}, $this->getUrl() );
+		return $result;
 	}
 
 	/**
@@ -126,15 +151,15 @@ class Url implements ConditionInterface {
 	 * @param  boolean $wrap
 	 * @return string
 	 */
-	public function getValidationRegex( $url, $wrap = true ) {
+	public function getMatchingRegex( $url, $wrap = true ) {
 		$parameters = [];
 
 		// Replace all parameters with placeholders
-		$validation_regex = preg_replace_callback( $this->url_regex, function( $matches ) use ( &$parameters ) {
+		$matching_regex = preg_replace_callback( $this->url_regex, function( $matches ) use ( &$parameters ) {
 			$name = $matches['name'];
 			$optional = ! empty( $matches['optional'] );
 			$regex = ! empty( $matches['regex'] ) ? $matches['regex'] : $this->parameter_regex;
-			$replacement = '(?P<' . $name . '>' . $regex . ')';
+			$replacement = '(?P<' . $name . '>' . $regex . ')/';
 			if ( $optional ) {
 				$replacement .= '?';
 			}
@@ -145,21 +170,21 @@ class Url implements ConditionInterface {
 		}, $url );
 
 		// quote the remaining string so that it does not get evaluated as regex
-		$validation_regex = preg_quote( $validation_regex, '~' );
+		$matching_regex = preg_quote( $matching_regex, '~' );
 
 		// replace the placeholders with the real parameter regexes
-		$validation_regex = str_replace( array_keys( $parameters ), array_values( $parameters ), $validation_regex );
+		$matching_regex = str_replace( array_keys( $parameters ), array_values( $parameters ), $matching_regex );
 
 		// add a question mark to the end to make the trailing slash optional
-		$validation_regex = $validation_regex . '?';
+		$matching_regex = $matching_regex . '?';
 
 		// make sure the regex matches the entire url
-		$validation_regex = '^' . $validation_regex . '$';
+		$matching_regex = '^' . $matching_regex . '$';
 
 		if ( $wrap ) {
-			$validation_regex = '~' . $validation_regex . '~';
+			$matching_regex = '~' . $matching_regex . '~';
 		}
 
-		return $validation_regex;
+		return $matching_regex;
 	}
 }

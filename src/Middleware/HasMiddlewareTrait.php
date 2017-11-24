@@ -62,6 +62,7 @@ trait HasMiddlewareTrait {
 	/**
 	 * Alias for addMiddleware
 	 *
+	 * @see    Obsidian\Middleware\HasMiddlewareTrait::addMiddleware
 	 * @param  string|callable|\Obsidian\Middleware\middlewareInterface|array $middleware
 	 * @return object                                                         $this
 	 */

@@ -101,4 +101,19 @@ class Router {
 	public function getCurrentRoute() {
 		return $this->current_route;
 	}
+
+	/**
+	 * Get a route's url with parameter values
+	 *
+	 * @return string
+	 */
+	public function getRouteUrl( $name, $parameters = [] ) {
+		$route = $this->getRoute( $name );
+
+		if ( $route === null ) {
+			return '';
+		}
+
+		return $route->getUrl( $parameters );
+	}
 }
